@@ -13,78 +13,123 @@ st.set_page_config(page_title="Dakshinaasya Darshini", page_icon="🕉️", layo
 # --- Custom Styling: Light Mode, Background Image, Footer Logo ---
 st.markdown("""
 <style>
-    /* Light mode theme */
+    /* Force light mode background */
     .stApp {
-        background-image: url('https://www.starsai.com/wp-content/uploads/sri-dakshinamurthy.jpg');
+        background: linear-gradient(
+            rgba(255, 255, 255, 0.92), 
+            rgba(255, 255, 255, 0.92)
+        ), url('https://www.starsai.com/wp-content/uploads/sri-dakshinamurthy.jpg');
         background-size: cover;
-        background-position: center;
+        background-position: center top;
         background-attachment: fixed;
+        background-repeat: no-repeat;
     }
     
-    /* Semi-transparent overlay for readability */
-    .stApp::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(255, 255, 255, 0.85);
-        z-index: -1;
+    /* Force light theme on main content */
+    .main .block-container {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-top: 1rem;
     }
     
-    /* Light mode text colors */
-    .stMarkdown, .stMarkdown p, h1, h2, h3, .stChatMessage {
+    /* Light mode text colors - force everywhere */
+    .stMarkdown, .stMarkdown p, .stMarkdown span, 
+    h1, h2, h3, p, span, label,
+    [data-testid="stChatMessage"] p,
+    .stChatMessage, div, .element-container {
         color: #1a1a1a !important;
+    }
+    
+    /* Title styling */
+    h1 {
+        color: #4a0080 !important;
     }
     
     /* Chat message styling */
     [data-testid="stChatMessage"] {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        border-radius: 10px;
-        padding: 10px;
-        margin: 5px 0;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 12px;
+        padding: 12px;
+        margin: 8px 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid rgba(0,0,0,0.05);
     }
     
     /* Chat input styling */
+    [data-testid="stChatInput"] {
+        background-color: white !important;
+    }
+    
     [data-testid="stChatInput"] textarea {
-        background-color: rgba(255, 255, 255, 0.95) !important;
+        background-color: white !important;
         color: #1a1a1a !important;
+        border: 1px solid #ddd !important;
     }
     
-    /* Sidebar styling */
+    /* HIDE SIDEBAR COMPLETELY */
     [data-testid="stSidebar"] {
-        background-color: rgba(255, 255, 255, 0.95) !important;
+        display: none !important;
     }
     
-    [data-testid="stSidebar"] .stMarkdown {
-        color: #1a1a1a !important;
+    [data-testid="stSidebarCollapsedControl"] {
+        display: none !important;
+    }
+    
+    /* Also hide the sidebar button/toggle */
+    button[kind="header"] {
+        display: none !important;
+    }
+    
+    .css-1rs6os, .css-17ziqus {
+        display: none !important;
     }
     
     /* Footer logo */
     .footer-logo {
         position: fixed;
-        bottom: 10px;
-        right: 10px;
-        z-index: 1000;
+        bottom: 15px;
+        right: 15px;
+        z-index: 9999;
     }
     
     .footer-logo img {
-        height: 60px;
-        opacity: 0.9;
-        border-radius: 5px;
+        height: 50px;
+        opacity: 0.85;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
     
     /* Expander styling */
     .streamlit-expanderHeader {
-        background-color: rgba(255, 255, 255, 0.9) !important;
+        background-color: white !important;
         color: #1a1a1a !important;
+        border-radius: 8px;
     }
     
-    /* Hide hamburger menu and footer */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
+    details {
+        background-color: white !important;
+        border-radius: 8px;
+        border: 1px solid #eee !important;
+    }
+    
+    /* Hide hamburger menu and default footer */
+    #MainMenu {display: none !important;}
+    footer {display: none !important;}
+    header {visibility: hidden !important;}
+    
+    /* Style the caption */
+    .stCaption, small {
+        color: #666 !important;
+    }
+    
+    /* New conversation button - add at top */
+    .new-convo-btn {
+        position: fixed;
+        top: 10px;
+        right: 15px;
+        z-index: 9999;
+    }
 </style>
 
 <!-- Footer Logo -->
@@ -203,7 +248,18 @@ def transcribe_audio(audio_bytes):
         return None
 
 # --- UI ---
-st.title("🕉️ Dakshinaasya Darshini")
+# New Conversation button at top
+col1, col2 = st.columns([5, 1])
+with col1:
+    st.title("🕉️ Dakshinaasya Darshini")
+with col2:
+    if st.button("🔄 New"):
+        st.session_state.messages = []
+        st.session_state.last_audio_len = 0
+        st.session_state.voice_input = ""
+        st.session_state.chat = model.start_chat(history=[]) if model else None
+        st.rerun()
+
 st.caption("Your guide in the spirit of Dakshinamurty — ask anything")
 
 # Initialize chat
@@ -285,12 +341,3 @@ if prompt := st.chat_input("Ask anything..."):
                     st.session_state.messages.append({"role": "assistant", "content": response.text})
                 except Exception as e:
                     st.error(f"Error: {e}")
-
-# Sidebar - minimal
-with st.sidebar:
-    st.markdown("### 🕉️")
-    if st.button("🔄 New Conversation"):
-        st.session_state.messages = []
-        st.session_state.last_audio_len = 0
-        st.session_state.chat = model.start_chat(history=[]) if model else None
-        st.rerun()
