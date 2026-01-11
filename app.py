@@ -46,6 +46,21 @@ st.markdown("""
         color: #4a0080 !important;
     }
     
+    /* Button styling - fix visibility */
+    .stButton > button {
+        background-color: #4a0080 !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 8px !important;
+        padding: 0.5rem 1rem !important;
+        font-weight: 500 !important;
+    }
+    
+    .stButton > button:hover {
+        background-color: #6a1b9a !important;
+        color: white !important;
+    }
+    
     /* Chat message styling */
     [data-testid="stChatMessage"] {
         background-color: rgba(255, 255, 255, 0.95) !important;
@@ -56,15 +71,34 @@ st.markdown("""
         border: 1px solid rgba(0,0,0,0.05);
     }
     
-    /* Chat input styling */
+    /* Chat input container - fix the black/white issue */
     [data-testid="stChatInput"] {
+        background-color: transparent !important;
+        border: none !important;
+    }
+    
+    [data-testid="stChatInputContainer"] {
         background-color: white !important;
+        border-radius: 25px !important;
+        border: 1px solid #ddd !important;
+        padding: 5px !important;
     }
     
     [data-testid="stChatInput"] textarea {
         background-color: white !important;
         color: #1a1a1a !important;
-        border: 1px solid #ddd !important;
+        border: none !important;
+    }
+    
+    /* Fix bottom bar area */
+    .stChatFloatingInputContainer {
+        background-color: rgba(255, 255, 255, 0.98) !important;
+        border-top: 1px solid #eee !important;
+        padding: 10px !important;
+    }
+    
+    [data-testid="stBottom"] {
+        background-color: rgba(255, 255, 255, 0.98) !important;
     }
     
     /* HIDE SIDEBAR COMPLETELY */
@@ -76,7 +110,6 @@ st.markdown("""
         display: none !important;
     }
     
-    /* Also hide the sidebar button/toggle */
     button[kind="header"] {
         display: none !important;
     }
@@ -88,7 +121,7 @@ st.markdown("""
     /* Footer logo */
     .footer-logo {
         position: fixed;
-        bottom: 15px;
+        bottom: 80px;
         right: 15px;
         z-index: 9999;
     }
@@ -98,19 +131,6 @@ st.markdown("""
         opacity: 0.85;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    /* Expander styling */
-    .streamlit-expanderHeader {
-        background-color: white !important;
-        color: #1a1a1a !important;
-        border-radius: 8px;
-    }
-    
-    details {
-        background-color: white !important;
-        border-radius: 8px;
-        border: 1px solid #eee !important;
     }
     
     /* Hide hamburger menu and default footer */
@@ -123,12 +143,24 @@ st.markdown("""
         color: #666 !important;
     }
     
-    /* New conversation button - add at top */
-    .new-convo-btn {
-        position: fixed;
-        top: 10px;
-        right: 15px;
-        z-index: 9999;
+    /* Mic button styling */
+    .mic-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    
+    /* Audio recorder button styling */
+    .stAudioRecorder > button, 
+    div[data-testid="stAudioRecorder"] button {
+        background-color: #4a0080 !important;
+        color: white !important;
+        border-radius: 50% !important;
+        width: 45px !important;
+        height: 45px !important;
+        padding: 0 !important;
+        min-width: 45px !important;
     }
 </style>
 
@@ -281,14 +313,18 @@ if not st.session_state.messages:
         st.write(welcome)
         st.session_state.messages.append({"role": "assistant", "content": welcome})
 
-# Voice input section - auto-transcribes when recording stops
+# Voice input - inline mic button
 if "last_audio_len" not in st.session_state:
     st.session_state.last_audio_len = 0
+if "recording_done" not in st.session_state:
+    st.session_state.recording_done = False
 
-with st.expander("🎤 Voice Input", expanded=False):
-    st.caption("Click to record, click again to stop — transcription is automatic")
-    audio = audiorecorder("🎙️ Start Recording", "⏹️ Stop Recording")
+# Create input area with mic button
+input_col1, input_col2 = st.columns([1, 12])
 
+with input_col1:
+    audio = audiorecorder("🎤", "🔴", key="audio_recorder")
+    
     if len(audio) > 0:
         audio_bytes = audio.export().read()
         current_len = len(audio_bytes)
@@ -296,16 +332,14 @@ with st.expander("🎤 Voice Input", expanded=False):
         # Auto-transcribe when new audio is detected
         if current_len != st.session_state.last_audio_len:
             st.session_state.last_audio_len = current_len
-            st.audio(audio_bytes, format="audio/wav")
             
-            with st.spinner("Transcribing..."):
+            with st.spinner("🎤 Transcribing..."):
                 transcribed_text = transcribe_audio(audio_bytes)
                 if transcribed_text:
                     st.session_state.voice_input = transcribed_text
-                    st.success(f"Transcribed: {transcribed_text}")
                     st.rerun()
                 else:
-                    st.warning("Could not understand audio. Please try again.")
+                    st.toast("Could not understand audio. Please try again.", icon="⚠️")
 
 # Process voice input if available
 if st.session_state.voice_input:
@@ -327,7 +361,7 @@ if st.session_state.voice_input:
                     st.error(f"Error: {e}")
 
 # Chat input (text)
-if prompt := st.chat_input("Ask anything..."):
+if prompt := st.chat_input("Ask anything... or tap 🎤 to speak"):
     with st.chat_message("user"):
         st.write(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
