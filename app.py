@@ -10,10 +10,93 @@ from pydub import AudioSegment
 # --- Configuration ---
 st.set_page_config(page_title="Dakshinaasya Darshini", page_icon="🕉️", layout="centered")
 
+# --- Custom Styling: Light Mode, Background Image, Footer Logo ---
+st.markdown("""
+<style>
+    /* Light mode theme */
+    .stApp {
+        background-image: url('https://www.starsai.com/wp-content/uploads/sri-dakshinamurthy.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+    }
+    
+    /* Semi-transparent overlay for readability */
+    .stApp::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.85);
+        z-index: -1;
+    }
+    
+    /* Light mode text colors */
+    .stMarkdown, .stMarkdown p, h1, h2, h3, .stChatMessage {
+        color: #1a1a1a !important;
+    }
+    
+    /* Chat message styling */
+    [data-testid="stChatMessage"] {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        border-radius: 10px;
+        padding: 10px;
+        margin: 5px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    /* Chat input styling */
+    [data-testid="stChatInput"] textarea {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        color: #1a1a1a !important;
+    }
+    
+    /* Sidebar styling */
+    [data-testid="stSidebar"] {
+        background-color: rgba(255, 255, 255, 0.95) !important;
+    }
+    
+    [data-testid="stSidebar"] .stMarkdown {
+        color: #1a1a1a !important;
+    }
+    
+    /* Footer logo */
+    .footer-logo {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        z-index: 1000;
+    }
+    
+    .footer-logo img {
+        height: 60px;
+        opacity: 0.9;
+        border-radius: 5px;
+    }
+    
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #1a1a1a !important;
+    }
+    
+    /* Hide hamburger menu and footer */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+</style>
+
+<!-- Footer Logo -->
+<div class="footer-logo">
+    <img src="https://vedantabharati.org/wp-content/uploads/2021/01/footer-logo.jpg" alt="Vedanta Bharati">
+</div>
+""", unsafe_allow_html=True)
+
 # --- Load Context & Initialize Model ---
 @st.cache_resource
 def setup_model():
-    api_key = st.secrets.get("GEMINI_API_KEY", None) or os.environ.get("GEMINI_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         st.error("GEMINI_API_KEY not found. Please set it before running.")
         return None, None
@@ -142,17 +225,23 @@ if not st.session_state.messages:
         st.write(welcome)
         st.session_state.messages.append({"role": "assistant", "content": welcome})
 
-# Voice input section
+# Voice input section - auto-transcribes when recording stops
+if "last_audio_len" not in st.session_state:
+    st.session_state.last_audio_len = 0
+
 with st.expander("🎤 Voice Input", expanded=False):
-    st.caption("Click the microphone to record, click again to stop")
+    st.caption("Click to record, click again to stop — transcription is automatic")
     audio = audiorecorder("🎙️ Start Recording", "⏹️ Stop Recording")
 
     if len(audio) > 0:
-        # Show audio playback
         audio_bytes = audio.export().read()
-        st.audio(audio_bytes, format="audio/wav")
-
-        if st.button("📝 Transcribe & Send"):
+        current_len = len(audio_bytes)
+        
+        # Auto-transcribe when new audio is detected
+        if current_len != st.session_state.last_audio_len:
+            st.session_state.last_audio_len = current_len
+            st.audio(audio_bytes, format="audio/wav")
+            
             with st.spinner("Transcribing..."):
                 transcribed_text = transcribe_audio(audio_bytes)
                 if transcribed_text:
@@ -197,18 +286,11 @@ if prompt := st.chat_input("Ask anything..."):
                 except Exception as e:
                     st.error(f"Error: {e}")
 
-# Sidebar
+# Sidebar - minimal
 with st.sidebar:
-    st.markdown("### About")
-    st.markdown("Based on the Dakshinamurty Ashtakam teachings by HH Sri Sri Shankarabharati Mahaswamiji")
-    st.markdown("---")
-    st.markdown("### How to Use")
-    st.markdown("💬 Type your question below")
-    st.markdown("🎤 Or expand Voice Input to speak")
-    st.markdown("---")
-    st.markdown("*\"Concise is compassionate\"*")
+    st.markdown("### 🕉️")
     if st.button("🔄 New Conversation"):
         st.session_state.messages = []
+        st.session_state.last_audio_len = 0
         st.session_state.chat = model.start_chat(history=[]) if model else None
         st.rerun()
-
