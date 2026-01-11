@@ -13,7 +13,7 @@ st.set_page_config(page_title="Dakshinaasya Darshini", page_icon="🕉️", layo
 # --- Load Context & Initialize Model ---
 @st.cache_resource
 def setup_model():
-    api_key = os.environ.get("GEMINI_API_KEY")
+    api_key = st.secrets.get("GEMINI_API_KEY", None) or os.environ.get("GEMINI_API_KEY")
     if not api_key:
         st.error("GEMINI_API_KEY not found. Please set it before running.")
         return None, None
@@ -211,3 +211,4 @@ with st.sidebar:
         st.session_state.messages = []
         st.session_state.chat = model.start_chat(history=[]) if model else None
         st.rerun()
+
