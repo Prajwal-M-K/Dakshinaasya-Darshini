@@ -1,0 +1,5 @@
+streamlit
+google-generativeai
+streamlit-audiorecorder
+SpeechRecognition
+pydub
