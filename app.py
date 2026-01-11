@@ -46,19 +46,19 @@ st.markdown("""
         color: #4a0080 !important;
     }
     
-    /* Button styling - fix visibility */
+    /* Button styling - transparent for New button */
     .stButton > button {
-        background-color: #4a0080 !important;
-        color: white !important;
-        border: none !important;
+        background-color: transparent !important;
+        color: #4a0080 !important;
+        border: 2px solid #4a0080 !important;
         border-radius: 8px !important;
         padding: 0.5rem 1rem !important;
         font-weight: 500 !important;
     }
     
     .stButton > button:hover {
-        background-color: #6a1b9a !important;
-        color: white !important;
+        background-color: rgba(74, 0, 128, 0.1) !important;
+        color: #4a0080 !important;
     }
     
     /* Chat message styling */
@@ -90,6 +90,11 @@ st.markdown("""
         border: none !important;
     }
     
+    /* Fix placeholder text color */
+    [data-testid="stChatInput"] textarea::placeholder {
+        color: #888 !important;
+    }
+    
     /* Fix bottom bar area */
     .stChatFloatingInputContainer {
         background-color: rgba(255, 255, 255, 0.98) !important;
@@ -99,6 +104,25 @@ st.markdown("""
     
     [data-testid="stBottom"] {
         background-color: rgba(255, 255, 255, 0.98) !important;
+    }
+    
+    /* Fix error/warning/info message styling */
+    [data-testid="stAlert"], .stAlert {
+        color: #1a1a1a !important;
+    }
+    
+    [data-testid="stAlert"] p, 
+    .stAlert p,
+    [data-testid="stNotification"] p,
+    div[data-baseweb="notification"] {
+        color: #1a1a1a !important;
+    }
+    
+    /* Toast notifications */
+    [data-testid="stToast"], 
+    [data-testid="stToast"] p,
+    div[data-baseweb="toast"] {
+        color: #1a1a1a !important;
     }
     
     /* HIDE SIDEBAR COMPLETELY */
