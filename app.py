@@ -159,53 +159,84 @@ st.markdown("""
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-/* Bottom input bar - LIGHT CREAM */
-[data-testid="stBottom"] {
+/* ============================================ */
+/* BOTTOM INPUT BAR - NUCLEAR OPTION FOR LIGHT */
+/* ============================================ */
+
+[data-testid="stBottom"],
+[data-testid="stBottom"] > div,
+[data-testid="stBottom"] > div > div,
+[data-testid="stBottom"] > div > div > div,
+[data-testid="stChatInput"],
+[data-testid="stChatInput"] > div,
+[data-testid="stChatInput"] > div > div,
+[data-testid="stChatInput"] form,
+[data-testid="stChatInput"] form > div {
+    background-color: #FAF8F3 !important;
     background: #FAF8F3 !important;
+}
+
+[data-testid="stBottom"] {
     border-top: 1px solid #E8E4DC !important;
 }
 
-[data-testid="stChatInput"] {
-    background: transparent !important;
-}
-
-[data-testid="stChatInput"] > div {
-    background: transparent !important;
-}
-
-/* The actual input container */
-div[data-baseweb="textarea"] {
+/* Input box itself */
+[data-testid="stChatInput"] [data-baseweb="textarea"],
+div[data-baseweb="textarea"],
+div[data-baseweb="base-input"] {
+    background-color: white !important;
     background: white !important;
     border: 1px solid #ccc !important;
     border-radius: 25px !important;
 }
 
-div[data-baseweb="textarea"]:focus-within {
-    border-color: #B8860B !important;
-    box-shadow: none !important;
-}
-
-/* Textarea itself */
 [data-testid="stChatInput"] textarea {
+    background-color: white !important;
     background: white !important;
     color: #333 !important;
+    caret-color: #333 !important;
 }
 
 /* Send button */
+[data-testid="stChatInput"] button[kind="primary"],
+[data-testid="stChatInput"] button[type="submit"],
 [data-testid="stChatInput"] button {
+    background-color: #B8860B !important;
     background: #B8860B !important;
     border-radius: 50% !important;
+    border: none !important;
 }
 
 [data-testid="stChatInput"] button svg {
     fill: white !important;
+    stroke: white !important;
 }
 
-/* Audio recorder styling */
-.audio-recorder-container {
-    display: flex;
-    justify-content: center;
-    margin: 10px 0;
+/* ============================================ */
+/* AUDIO RECORDER - HIDE FROM MAIN, SHOW FIXED */
+/* ============================================ */
+
+/* Hide the audio recorder from normal flow */
+[data-testid="stAudioInput"],
+.stAudioInput,
+iframe[title="audio_recorder_streamlit.audio_recorder"] {
+    position: fixed !important;
+    bottom: 12px !important;
+    right: 90px !important;
+    z-index: 1001 !important;
+    width: 50px !important;
+    height: 50px !important;
+}
+
+/* Hide parent containers but keep iframe visible */
+.element-container:has(iframe[title="audio_recorder_streamlit.audio_recorder"]) {
+    position: fixed !important;
+    bottom: 12px !important;
+    right: 90px !important;
+    z-index: 1001 !important;
+    width: 50px !important;
+    height: 50px !important;
+    background: transparent !important;
 }
 </style>
 
@@ -213,6 +244,24 @@ div[data-baseweb="textarea"]:focus-within {
     <span class="header-title">Dakshinaasya Darshini</span>
     <span class="header-icon">⚙️</span>
 </div>
+
+<script>
+// Force light theme on bottom bar
+const observer = new MutationObserver(function(mutations) {
+    const bottom = document.querySelector('[data-testid="stBottom"]');
+    if (bottom) {
+        bottom.style.setProperty('background-color', '#FAF8F3', 'important');
+        bottom.style.setProperty('background', '#FAF8F3', 'important');
+        const allDivs = bottom.querySelectorAll('div');
+        allDivs.forEach(div => {
+            if (!div.querySelector('textarea') && !div.querySelector('button')) {
+                div.style.setProperty('background-color', '#FAF8F3', 'important');
+            }
+        });
+    }
+});
+observer.observe(document.body, { childList: true, subtree: true });
+</script>
 """, unsafe_allow_html=True)
 
 # --- Session State ---
@@ -277,24 +326,6 @@ if len(st.session_state.messages) == 0:
             st.rerun()
     
     st.markdown('<p class="mic-hint">🎤 Tap mic to speak or type below</p>', unsafe_allow_html=True)
-    
-    # Audio recorder
-    audio_bytes = audio_recorder(
-        text="",
-        recording_color="#B8860B",
-        neutral_color="#B8860B",
-        icon_size="2x",
-        pause_threshold=2.0
-    )
-    
-    if audio_bytes and audio_bytes != st.session_state.audio_processed:
-        st.session_state.audio_processed = audio_bytes
-        text = transcribe_audio(audio_bytes)
-        if text:
-            process_message(f"🎤 {text}")
-            st.rerun()
-        else:
-            st.toast("Could not understand audio", icon="⚠️")
 
 else:
     # Show chat history
@@ -302,8 +333,27 @@ else:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
+# --- Audio Recorder (will be positioned by CSS) ---
+audio_bytes = audio_recorder(
+    text="",
+    recording_color="#B8860B",
+    neutral_color="#B8860B",
+    icon_size="2x",
+    pause_threshold=2.0
+)
+
+if audio_bytes and audio_bytes != st.session_state.audio_processed:
+    st.session_state.audio_processed = audio_bytes
+    text = transcribe_audio(audio_bytes)
+    if text:
+        process_message(f"🎤 {text}")
+        st.rerun()
+    else:
+        st.toast("Could not understand audio", icon="⚠️")
+
 # --- Chat Input ---
 if prompt := st.chat_input("Type your message..."):
     process_message(prompt)
     st.rerun()
+
 
