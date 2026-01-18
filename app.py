@@ -10,14 +10,14 @@ from pydub import AudioSegment
 # --- Configuration ---
 st.set_page_config(page_title="Dakshinaasya Darshini", page_icon="🕉️", layout="centered")
 
-# --- Custom Styling: Light Mode, Background Image, Footer Logo ---
+# --- Custom Styling to match the UI design ---
 st.markdown("""
 <style>
-    /* Force light mode background */
+    /* Background image with overlay */
     .stApp {
         background: linear-gradient(
-            rgba(255, 255, 255, 0.92), 
-            rgba(255, 255, 255, 0.92)
+            rgba(255, 255, 255, 0.88), 
+            rgba(255, 255, 255, 0.88)
         ), url('https://www.starsai.com/wp-content/uploads/sri-dakshinamurthy.jpg');
         background-size: cover;
         background-position: center top;
@@ -25,172 +25,248 @@ st.markdown("""
         background-repeat: no-repeat;
     }
     
-    /* Force light theme on main content */
+    /* Hide default Streamlit elements */
+    #MainMenu {display: none !important;}
+    footer {display: none !important;}
+    header {visibility: hidden !important;}
+    [data-testid="stSidebar"] {display: none !important;}
+    [data-testid="stSidebarCollapsedControl"] {display: none !important;}
+    
+    /* Main container styling */
     .main .block-container {
-        background-color: rgba(255, 255, 255, 0.95);
-        border-radius: 15px;
-        padding: 2rem;
-        margin-top: 1rem;
+        padding-top: 0 !important;
+        padding-bottom: 100px !important;
+        max-width: 800px !important;
     }
     
-    /* Light mode text colors - force everywhere */
-    .stMarkdown, .stMarkdown p, .stMarkdown span, 
-    h1, h2, h3, p, span, label,
-    [data-testid="stChatMessage"] p,
-    .stChatMessage, div, .element-container {
+    /* Header bar */
+    .header-bar {
+        background-color: #B8860B;
+        padding: 15px 25px;
+        margin: -1rem -1rem 0 -1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+    }
+    
+    .header-title {
+        color: white !important;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin: 0;
+    }
+    
+    .header-settings {
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+    
+    /* Content area */
+    .content-area {
+        padding-top: 80px;
+        text-align: center;
+    }
+    
+    /* Om symbol */
+    .om-symbol {
+        font-size: 5rem;
+        color: #B8860B;
+        margin: 30px 0 20px 0;
+        line-height: 1;
+    }
+    
+    /* Namaste heading */
+    .namaste-heading {
+        font-size: 2.5rem;
+        font-weight: 700;
         color: #1a1a1a !important;
+        margin: 20px 0 15px 0;
     }
     
-    /* Title styling */
-    h1 {
-        color: #4a0080 !important;
+    /* Subtitle */
+    .subtitle {
+        font-size: 1.1rem;
+        color: #666 !important;
+        margin-bottom: 40px;
+        line-height: 1.6;
     }
     
-    /* Button styling - transparent for New button */
+    /* Try asking label */
+    .try-asking {
+        color: #999 !important;
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+    }
+    
+    /* Suggestion buttons container */
+    .suggestion-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 40px;
+    }
+    
+    /* Individual suggestion button */
+    .suggestion-btn {
+        background-color: transparent !important;
+        border: 1.5px solid #B8860B !important;
+        color: #4a4a4a !important;
+        padding: 12px 24px !important;
+        border-radius: 25px !important;
+        font-size: 0.95rem !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 400 !important;
+    }
+    
+    .suggestion-btn:hover {
+        background-color: rgba(184, 134, 11, 0.1) !important;
+    }
+    
+    /* Streamlit button overrides for suggestion buttons */
     .stButton > button {
         background-color: transparent !important;
-        color: #4a0080 !important;
-        border: 2px solid #4a0080 !important;
-        border-radius: 8px !important;
-        padding: 0.5rem 1rem !important;
-        font-weight: 500 !important;
+        border: 1.5px solid #B8860B !important;
+        color: #4a4a4a !important;
+        padding: 12px 24px !important;
+        border-radius: 25px !important;
+        font-size: 0.95rem !important;
+        font-weight: 400 !important;
+        transition: all 0.2s ease;
     }
     
     .stButton > button:hover {
-        background-color: rgba(74, 0, 128, 0.1) !important;
-        color: #4a0080 !important;
+        background-color: rgba(184, 134, 11, 0.1) !important;
+        border-color: #B8860B !important;
+        color: #4a4a4a !important;
+    }
+    
+    /* Mic hint text */
+    .mic-hint {
+        color: #B8860B !important;
+        font-size: 0.95rem;
+        margin: 30px 0 20px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .mic-icon-hint {
+        font-size: 1.1rem;
+    }
+    
+    /* Bottom input container */
+    .input-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: #f5f5f5;
+        padding: 15px 20px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        z-index: 1000;
+    }
+    
+    /* Text input styling */
+    .stTextInput > div > div > input {
+        border-radius: 25px !important;
+        border: 1px solid #ddd !important;
+        padding: 15px 20px !important;
+        font-size: 1rem !important;
+        background-color: white !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #B8860B !important;
+        box-shadow: none !important;
+    }
+    
+    /* Mic button */
+    .mic-button {
+        background-color: #B8860B !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 55px !important;
+        height: 55px !important;
+        font-size: 1.5rem !important;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
     }
     
     /* Chat message styling */
     [data-testid="stChatMessage"] {
         background-color: rgba(255, 255, 255, 0.95) !important;
-        border-radius: 12px;
-        padding: 12px;
-        margin: 8px 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        border: 1px solid rgba(0,0,0,0.05);
+        border-radius: 15px;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
     
-    /* Chat input container - fix the black/white issue */
-    [data-testid="stChatInput"] {
-        background-color: transparent !important;
-        border: none !important;
-    }
-    
-    [data-testid="stChatInputContainer"] {
-        background-color: white !important;
-        border-radius: 25px !important;
-        border: 1px solid #ddd !important;
-        padding: 5px !important;
+    /* Hide the floating chat input */
+    [data-testid="stBottom"] {
+        background-color: #f5f5f5 !important;
+        padding: 10px 20px !important;
     }
     
     [data-testid="stChatInput"] textarea {
+        border-radius: 25px !important;
+        border: 1px solid #ddd !important;
+        padding: 12px 20px !important;
         background-color: white !important;
-        color: #1a1a1a !important;
+    }
+    
+    /* Audio recorder styling */
+    .audio-recorder-col {
+        display: flex;
+        justify-content: center;
+    }
+    
+    div[data-testid="stAudioRecorder"] button,
+    .stAudioRecorder > button {
+        background-color: #B8860B !important;
+        color: white !important;
+        border-radius: 50% !important;
+        width: 55px !important;
+        height: 55px !important;
+        min-width: 55px !important;
+        font-size: 1.3rem !important;
         border: none !important;
     }
     
-    /* Fix placeholder text color */
-    [data-testid="stChatInput"] textarea::placeholder {
-        color: #888 !important;
-    }
-    
-    /* Fix bottom bar area */
-    .stChatFloatingInputContainer {
-        background-color: rgba(255, 255, 255, 0.98) !important;
-        border-top: 1px solid #eee !important;
-        padding: 10px !important;
-    }
-    
-    [data-testid="stBottom"] {
-        background-color: rgba(255, 255, 255, 0.98) !important;
-    }
-    
-    /* Fix error/warning/info message styling */
-    [data-testid="stAlert"], .stAlert {
-        color: #1a1a1a !important;
-    }
-    
-    [data-testid="stAlert"] p, 
-    .stAlert p,
-    [data-testid="stNotification"] p,
-    div[data-baseweb="notification"] {
-        color: #1a1a1a !important;
-    }
-    
     /* Toast notifications */
-    [data-testid="stToast"], 
-    [data-testid="stToast"] p,
-    div[data-baseweb="toast"] {
+    [data-testid="stToast"] {
         color: #1a1a1a !important;
     }
     
-    /* HIDE SIDEBAR COMPLETELY */
-    [data-testid="stSidebar"] {
-        display: none !important;
-    }
-    
-    [data-testid="stSidebarCollapsedControl"] {
-        display: none !important;
-    }
-    
-    button[kind="header"] {
-        display: none !important;
-    }
-    
-    .css-1rs6os, .css-17ziqus {
-        display: none !important;
-    }
-    
-    /* Footer logo */
-    .footer-logo {
-        position: fixed;
-        bottom: 80px;
-        right: 15px;
-        z-index: 9999;
-    }
-    
-    .footer-logo img {
-        height: 50px;
-        opacity: 0.85;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    
-    /* Hide hamburger menu and default footer */
-    #MainMenu {display: none !important;}
-    footer {display: none !important;}
-    header {visibility: hidden !important;}
-    
-    /* Style the caption */
-    .stCaption, small {
-        color: #666 !important;
-    }
-    
-    /* Mic button styling */
-    .mic-container {
+    /* Welcome screen specific - center align everything */
+    .welcome-container {
         display: flex;
+        flex-direction: column;
         align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    
-    /* Audio recorder button styling */
-    .stAudioRecorder > button, 
-    div[data-testid="stAudioRecorder"] button {
-        background-color: #4a0080 !important;
-        color: white !important;
-        border-radius: 50% !important;
-        width: 45px !important;
-        height: 45px !important;
-        padding: 0 !important;
-        min-width: 45px !important;
+        justify-content: center;
+        min-height: 70vh;
+        text-align: center;
     }
 </style>
 
-<!-- Footer Logo -->
-<div class="footer-logo">
-    <img src="https://vedantabharati.org/wp-content/uploads/2021/01/footer-logo.jpg" alt="Vedanta Bharati">
+<!-- Header Bar -->
+<div class="header-bar">
+    <span class="header-title">Dakshinaasya Darshini</span>
+    <span class="header-settings">⚙️</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -304,49 +380,107 @@ def transcribe_audio(audio_bytes):
         return None
 
 # --- UI ---
-# New Conversation button at top
-col1, col2 = st.columns([5, 1])
-with col1:
-    st.title("🕉️ Dakshinaasya Darshini")
-with col2:
-    if st.button("🔄 New"):
-        st.session_state.messages = []
-        st.session_state.last_audio_len = 0
-        st.session_state.voice_input = ""
-        st.session_state.chat = model.start_chat(history=[]) if model else None
-        st.rerun()
 
-st.caption("Your guide in the spirit of Dakshinamurty — ask anything")
-
-# Initialize chat
+# Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.chat = model.start_chat(history=[]) if model else None
 if "voice_input" not in st.session_state:
     st.session_state.voice_input = ""
-
-# Display chat history
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.write(msg["content"])
-
-# Welcome message
-if not st.session_state.messages:
-    with st.chat_message("assistant"):
-        welcome = "🙏 Hari Om. I am here — what is on your mind?"
-        st.write(welcome)
-        st.session_state.messages.append({"role": "assistant", "content": welcome})
-
-# Voice input - inline mic button
 if "last_audio_len" not in st.session_state:
     st.session_state.last_audio_len = 0
-if "recording_done" not in st.session_state:
-    st.session_state.recording_done = False
+if "show_welcome" not in st.session_state:
+    st.session_state.show_welcome = True
 
-# Create input area with mic button
-input_col1, input_col2 = st.columns([1, 12])
+# Add top padding for fixed header
+st.markdown('<div style="padding-top: 60px;"></div>', unsafe_allow_html=True)
 
-with input_col1:
+# Function to handle suggestion click
+def handle_suggestion(suggestion):
+    st.session_state.pending_prompt = suggestion
+    st.session_state.show_welcome = False
+
+# Welcome screen (only show when no conversation)
+if st.session_state.show_welcome and len(st.session_state.messages) == 0:
+    # Om Symbol
+    st.markdown('<div class="om-symbol">ॐ</div>', unsafe_allow_html=True)
+    
+    # Namaste heading
+    st.markdown('<h1 class="namaste-heading">Namaste!</h1>', unsafe_allow_html=True)
+    
+    # Subtitle
+    st.markdown('''
+    <p class="subtitle">
+        I am Dakshinaasya Darshini, your spiritual guide.<br>
+        Ask me anything.
+    </p>
+    ''', unsafe_allow_html=True)
+    
+    # Try asking label
+    st.markdown('<p class="try-asking">Try asking:</p>', unsafe_allow_html=True)
+    
+    # Suggestion buttons - 2 rows of 2 buttons
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Explain Sloka 1", key="btn1", use_container_width=True):
+            handle_suggestion("Explain Sloka 1")
+            st.rerun()
+    with col2:
+        if st.button("What is Tat Tvam Asi?", key="btn2", use_container_width=True):
+            handle_suggestion("What is Tat Tvam Asi?")
+            st.rerun()
+    
+    col3, col4 = st.columns(2)
+    with col3:
+        if st.button("I feel anxious", key="btn3", use_container_width=True):
+            handle_suggestion("I feel anxious")
+            st.rerun()
+    with col4:
+        if st.button("Mirror analogy", key="btn4", use_container_width=True):
+            handle_suggestion("Mirror analogy")
+            st.rerun()
+    
+    # Mic hint
+    st.markdown('''
+    <p class="mic-hint">
+        <span class="mic-icon-hint">🎤</span>
+        Tap mic to speak or type below
+    </p>
+    ''', unsafe_allow_html=True)
+
+else:
+    # Display chat history
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+
+# Process pending prompt from suggestion buttons
+if "pending_prompt" in st.session_state and st.session_state.pending_prompt:
+    prompt = st.session_state.pending_prompt
+    st.session_state.pending_prompt = None
+    
+    with st.chat_message("user"):
+        st.write(prompt)
+    st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    if st.session_state.chat:
+        with st.chat_message("assistant"):
+            with st.spinner(""):
+                try:
+                    response = st.session_state.chat.send_message(prompt)
+                    st.write(response.text)
+                    st.session_state.messages.append({"role": "assistant", "content": response.text})
+                except Exception as e:
+                    st.error(f"Error: {e}")
+    st.rerun()
+
+# Voice input section - at bottom with text input
+st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+
+# Create columns for text input and mic button
+input_col, mic_col = st.columns([10, 1])
+
+with mic_col:
     audio = audiorecorder("🎤", "🔴", key="audio_recorder")
     
     if len(audio) > 0:
@@ -357,10 +491,11 @@ with input_col1:
         if current_len != st.session_state.last_audio_len:
             st.session_state.last_audio_len = current_len
             
-            with st.spinner("🎤 Transcribing..."):
+            with st.spinner("🎤"):
                 transcribed_text = transcribe_audio(audio_bytes)
                 if transcribed_text:
                     st.session_state.voice_input = transcribed_text
+                    st.session_state.show_welcome = False
                     st.rerun()
                 else:
                     st.toast("Could not understand audio. Please try again.", icon="⚠️")
@@ -368,7 +503,7 @@ with input_col1:
 # Process voice input if available
 if st.session_state.voice_input:
     prompt = st.session_state.voice_input
-    st.session_state.voice_input = ""  # Clear it
+    st.session_state.voice_input = ""
 
     with st.chat_message("user"):
         st.write(f"🎤 {prompt}")
@@ -384,8 +519,10 @@ if st.session_state.voice_input:
                 except Exception as e:
                     st.error(f"Error: {e}")
 
-# Chat input (text)
-if prompt := st.chat_input("Ask anything... or tap 🎤 to speak"):
+# Chat input (text) - main input at bottom
+if prompt := st.chat_input("Type your message..."):
+    st.session_state.show_welcome = False
+    
     with st.chat_message("user"):
         st.write(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
