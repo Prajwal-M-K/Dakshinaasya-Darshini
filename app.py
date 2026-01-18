@@ -159,6 +159,15 @@ st.markdown("""
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
+/* Chat message text - FORCE BLACK */
+[data-testid="stChatMessage"] p,
+[data-testid="stChatMessage"] span,
+[data-testid="stChatMessage"] div,
+[data-testid="stChatMessage"] li,
+[data-testid="stChatMessage"] * {
+    color: #1a1a1a !important;
+}
+
 /* ============================================ */
 /* BOTTOM INPUT BAR - NUCLEAR OPTION FOR LIGHT */
 /* ============================================ */
@@ -213,30 +222,41 @@ div[data-baseweb="base-input"] {
 }
 
 /* ============================================ */
-/* AUDIO RECORDER - HIDE FROM MAIN, SHOW FIXED */
+/* AUDIO RECORDER - POSITION INSIDE INPUT BAR */
 /* ============================================ */
 
-/* Hide the audio recorder from normal flow */
+/* Position the audio recorder inside the input bar, left of send button */
 [data-testid="stAudioInput"],
 .stAudioInput,
 iframe[title="audio_recorder_streamlit.audio_recorder"] {
     position: fixed !important;
-    bottom: 12px !important;
-    right: 90px !important;
+    bottom: 18px !important;
+    left: 50% !important;
+    transform: translateX(calc(-50% + 200px)) !important;
     z-index: 1001 !important;
-    width: 50px !important;
-    height: 50px !important;
+    width: 40px !important;
+    height: 40px !important;
 }
 
 /* Hide parent containers but keep iframe visible */
 .element-container:has(iframe[title="audio_recorder_streamlit.audio_recorder"]) {
     position: fixed !important;
-    bottom: 12px !important;
-    right: 90px !important;
+    bottom: 18px !important;
+    left: 50% !important;
+    transform: translateX(calc(-50% + 200px)) !important;
     z-index: 1001 !important;
-    width: 50px !important;
-    height: 50px !important;
+    width: 40px !important;
+    height: 40px !important;
     background: transparent !important;
+}
+
+@media (max-width: 600px) {
+    iframe[title="audio_recorder_streamlit.audio_recorder"],
+    .element-container:has(iframe[title="audio_recorder_streamlit.audio_recorder"]) {
+        left: auto !important;
+        right: 70px !important;
+        transform: none !important;
+    }
 }
 </style>
 
