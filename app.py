@@ -216,23 +216,62 @@ st.markdown("""
         box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
     
-    /* Hide the floating chat input */
+    /* Bottom input area - LIGHT THEME */
     [data-testid="stBottom"] {
-        background-color: #f5f5f5 !important;
-        padding: 10px 20px !important;
+        background-color: rgba(245, 243, 238, 0.98) !important;
+        background: linear-gradient(
+            rgba(245, 243, 238, 0.98), 
+            rgba(245, 243, 238, 0.98)
+        ), url('https://www.starsai.com/wp-content/uploads/sri-dakshinamurthy.jpg') !important;
+        background-size: cover !important;
+        background-position: center bottom !important;
+        padding: 15px 20px !important;
+        border-top: 1px solid #e0d9c8 !important;
     }
     
+    /* Chat input container wrapper */
+    [data-testid="stChatInputContainer"] {
+        background-color: transparent !important;
+    }
+    
+    /* The outer chat input wrapper */
+    [data-testid="stChatInput"] {
+        background-color: transparent !important;
+    }
+    
+    /* Chat input textarea */
     [data-testid="stChatInput"] textarea {
-        border-radius: 25px !important;
-        border: 1px solid #ddd !important;
-        padding: 12px 20px !important;
+        border-radius: 30px !important;
+        border: 1.5px solid #ccc !important;
+        padding: 15px 60px 15px 20px !important;
         background-color: white !important;
+        color: #333 !important;
+        font-size: 1rem !important;
     }
     
-    /* Audio recorder styling */
-    .audio-recorder-col {
-        display: flex;
-        justify-content: center;
+    [data-testid="stChatInput"] textarea::placeholder {
+        color: #999 !important;
+    }
+    
+    [data-testid="stChatInput"] textarea:focus {
+        border-color: #B8860B !important;
+        box-shadow: 0 0 0 1px #B8860B !important;
+    }
+    
+    /* Style the send button in chat input */
+    [data-testid="stChatInput"] button {
+        background-color: #B8860B !important;
+        color: white !important;
+        border-radius: 50% !important;
+        border: none !important;
+    }
+    
+    /* Audio recorder styling - positioned to look like it's in the input */
+    .mic-wrapper {
+        position: fixed;
+        bottom: 25px;
+        right: 80px;
+        z-index: 1001;
     }
     
     div[data-testid="stAudioRecorder"] button,
@@ -240,11 +279,12 @@ st.markdown("""
         background-color: #B8860B !important;
         color: white !important;
         border-radius: 50% !important;
-        width: 55px !important;
-        height: 55px !important;
-        min-width: 55px !important;
-        font-size: 1.3rem !important;
+        width: 45px !important;
+        height: 45px !important;
+        min-width: 45px !important;
+        font-size: 1.2rem !important;
         border: none !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important;
     }
     
     /* Toast notifications */
@@ -260,6 +300,16 @@ st.markdown("""
         justify-content: center;
         min-height: 70vh;
         text-align: center;
+    }
+    
+    /* Force all dark mode overrides to light */
+    .stApp, .main, [data-testid="stAppViewContainer"] {
+        color-scheme: light !important;
+    }
+    
+    /* Override any remaining dark backgrounds */
+    div[data-baseweb="base-input"] {
+        background-color: white !important;
     }
 </style>
 
@@ -474,31 +524,26 @@ if "pending_prompt" in st.session_state and st.session_state.pending_prompt:
                     st.error(f"Error: {e}")
     st.rerun()
 
-# Voice input section - at bottom with text input
-st.markdown('<div style="height: 20px;"></div>', unsafe_allow_html=True)
+# Voice input section - mic button positioned via CSS
+# Audio recorder (will be positioned by CSS to appear in input bar)
+audio = audiorecorder("🎤", "🔴", key="audio_recorder")
 
-# Create columns for text input and mic button
-input_col, mic_col = st.columns([10, 1])
-
-with mic_col:
-    audio = audiorecorder("🎤", "🔴", key="audio_recorder")
+if len(audio) > 0:
+    audio_bytes = audio.export().read()
+    current_len = len(audio_bytes)
     
-    if len(audio) > 0:
-        audio_bytes = audio.export().read()
-        current_len = len(audio_bytes)
+    # Auto-transcribe when new audio is detected
+    if current_len != st.session_state.last_audio_len:
+        st.session_state.last_audio_len = current_len
         
-        # Auto-transcribe when new audio is detected
-        if current_len != st.session_state.last_audio_len:
-            st.session_state.last_audio_len = current_len
-            
-            with st.spinner("🎤"):
-                transcribed_text = transcribe_audio(audio_bytes)
-                if transcribed_text:
-                    st.session_state.voice_input = transcribed_text
-                    st.session_state.show_welcome = False
-                    st.rerun()
-                else:
-                    st.toast("Could not understand audio. Please try again.", icon="⚠️")
+        with st.spinner("🎤 Transcribing..."):
+            transcribed_text = transcribe_audio(audio_bytes)
+            if transcribed_text:
+                st.session_state.voice_input = transcribed_text
+                st.session_state.show_welcome = False
+                st.rerun()
+            else:
+                st.toast("Could not understand audio. Please try again.", icon="⚠️")
 
 # Process voice input if available
 if st.session_state.voice_input:
