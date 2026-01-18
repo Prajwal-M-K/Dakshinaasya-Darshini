@@ -3,7 +3,6 @@ import streamlit as st
 import google.generativeai as genai
 import os
 import speech_recognition as sr
-from audiorecorder import audiorecorder
 import io
 from pydub import AudioSegment
 
@@ -35,7 +34,7 @@ st.markdown("""
     /* Main container styling */
     .main .block-container {
         padding-top: 0 !important;
-        padding-bottom: 100px !important;
+        padding-bottom: 120px !important;
         max-width: 800px !important;
     }
     
@@ -67,18 +66,13 @@ st.markdown("""
         cursor: pointer;
     }
     
-    /* Content area */
-    .content-area {
-        padding-top: 80px;
-        text-align: center;
-    }
-    
     /* Om symbol */
     .om-symbol {
         font-size: 5rem;
         color: #B8860B;
         margin: 30px 0 20px 0;
         line-height: 1;
+        text-align: center;
     }
     
     /* Namaste heading */
@@ -87,6 +81,7 @@ st.markdown("""
         font-weight: 700;
         color: #1a1a1a !important;
         margin: 20px 0 15px 0;
+        text-align: center;
     }
     
     /* Subtitle */
@@ -95,6 +90,7 @@ st.markdown("""
         color: #666 !important;
         margin-bottom: 40px;
         line-height: 1.6;
+        text-align: center;
     }
     
     /* Try asking label */
@@ -102,32 +98,7 @@ st.markdown("""
         color: #999 !important;
         font-size: 0.95rem;
         margin-bottom: 20px;
-    }
-    
-    /* Suggestion buttons container */
-    .suggestion-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 40px;
-    }
-    
-    /* Individual suggestion button */
-    .suggestion-btn {
-        background-color: transparent !important;
-        border: 1.5px solid #B8860B !important;
-        color: #4a4a4a !important;
-        padding: 12px 24px !important;
-        border-radius: 25px !important;
-        font-size: 0.95rem !important;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 400 !important;
-    }
-    
-    .suggestion-btn:hover {
-        background-color: rgba(184, 134, 11, 0.1) !important;
+        text-align: center;
     }
     
     /* Streamlit button overrides for suggestion buttons */
@@ -157,54 +128,7 @@ st.markdown("""
         align-items: center;
         justify-content: center;
         gap: 8px;
-    }
-    
-    .mic-icon-hint {
-        font-size: 1.1rem;
-    }
-    
-    /* Bottom input container */
-    .input-container {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background-color: #f5f5f5;
-        padding: 15px 20px;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        z-index: 1000;
-    }
-    
-    /* Text input styling */
-    .stTextInput > div > div > input {
-        border-radius: 25px !important;
-        border: 1px solid #ddd !important;
-        padding: 15px 20px !important;
-        font-size: 1rem !important;
-        background-color: white !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #B8860B !important;
-        box-shadow: none !important;
-    }
-    
-    /* Mic button */
-    .mic-button {
-        background-color: #B8860B !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 50% !important;
-        width: 55px !important;
-        height: 55px !important;
-        font-size: 1.5rem !important;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+        text-align: center;
     }
     
     /* Chat message styling */
@@ -216,75 +140,94 @@ st.markdown("""
         box-shadow: 0 2px 10px rgba(0,0,0,0.08);
     }
     
-    /* Bottom input area - LIGHT THEME */
+    /* HIDE the default bottom chat input completely */
     [data-testid="stBottom"] {
-        background-color: rgba(245, 243, 238, 0.98) !important;
-        background: linear-gradient(
-            rgba(245, 243, 238, 0.98), 
-            rgba(245, 243, 238, 0.98)
-        ), url('https://www.starsai.com/wp-content/uploads/sri-dakshinamurthy.jpg') !important;
-        background-size: cover !important;
-        background-position: center bottom !important;
-        padding: 15px 20px !important;
-        border-top: 1px solid #e0d9c8 !important;
+        display: none !important;
     }
     
-    /* Chat input container wrapper */
-    [data-testid="stChatInputContainer"] {
-        background-color: transparent !important;
-    }
-    
-    /* The outer chat input wrapper */
-    [data-testid="stChatInput"] {
-        background-color: transparent !important;
-    }
-    
-    /* Chat input textarea */
-    [data-testid="stChatInput"] textarea {
-        border-radius: 30px !important;
-        border: 1.5px solid #ccc !important;
-        padding: 15px 60px 15px 20px !important;
-        background-color: white !important;
-        color: #333 !important;
-        font-size: 1rem !important;
-    }
-    
-    [data-testid="stChatInput"] textarea::placeholder {
-        color: #999 !important;
-    }
-    
-    [data-testid="stChatInput"] textarea:focus {
-        border-color: #B8860B !important;
-        box-shadow: 0 0 0 1px #B8860B !important;
-    }
-    
-    /* Style the send button in chat input */
-    [data-testid="stChatInput"] button {
-        background-color: #B8860B !important;
-        color: white !important;
-        border-radius: 50% !important;
-        border: none !important;
-    }
-    
-    /* Audio recorder styling - positioned to look like it's in the input */
-    .mic-wrapper {
+    /* Custom fixed bottom input bar */
+    .custom-input-bar {
         position: fixed;
-        bottom: 25px;
-        right: 80px;
-        z-index: 1001;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(
+            rgba(250, 248, 244, 0.98), 
+            rgba(250, 248, 244, 0.98)
+        );
+        padding: 15px 20px;
+        z-index: 1000;
+        border-top: 1px solid #e8e4dc;
     }
     
-    div[data-testid="stAudioRecorder"] button,
-    .stAudioRecorder > button {
+    .input-wrapper {
+        max-width: 760px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background-color: white;
+        border: 1.5px solid #ccc;
+        border-radius: 30px;
+        padding: 5px 5px 5px 20px;
+    }
+    
+    .input-wrapper:focus-within {
+        border-color: #B8860B;
+    }
+    
+    /* Style the text input inside the form */
+    .stTextInput > div > div > input {
+        border: none !important;
+        background: transparent !important;
+        padding: 10px 0 !important;
+        font-size: 1rem !important;
+        color: #333 !important;
+        box-shadow: none !important;
+    }
+    
+    .stTextInput > div > div > input:focus {
+        border: none !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+    
+    .stTextInput > div > div {
+        border: none !important;
+        background: transparent !important;
+    }
+    
+    .stTextInput label {
+        display: none !important;
+    }
+    
+    /* Mic button styling */
+    .mic-btn {
         background-color: #B8860B !important;
         color: white !important;
-        border-radius: 50% !important;
-        width: 45px !important;
-        height: 45px !important;
-        min-width: 45px !important;
-        font-size: 1.2rem !important;
         border: none !important;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.15) !important;
+        border-radius: 50% !important;
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px !important;
+        font-size: 1.2rem !important;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    /* Style form submit button */
+    .stForm [data-testid="stFormSubmitButton"] > button {
+        background-color: #B8860B !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 50% !important;
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px !important;
+        padding: 0 !important;
     }
     
     /* Toast notifications */
@@ -292,24 +235,9 @@ st.markdown("""
         color: #1a1a1a !important;
     }
     
-    /* Welcome screen specific - center align everything */
-    .welcome-container {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 70vh;
-        text-align: center;
-    }
-    
-    /* Force all dark mode overrides to light */
+    /* Force light theme */
     .stApp, .main, [data-testid="stAppViewContainer"] {
         color-scheme: light !important;
-    }
-    
-    /* Override any remaining dark backgrounds */
-    div[data-baseweb="base-input"] {
-        background-color: white !important;
     }
 </style>
 
@@ -404,51 +332,36 @@ REMEMBER: You are like a spiritual Alexa — immediate, helpful, always availabl
 
 model, context = setup_model()
 
-# --- Voice Input Function ---
-def transcribe_audio(audio_bytes):
-    """Convert audio bytes to text using Google Speech Recognition"""
-    try:
-        # Convert audio to WAV format for speech recognition
-        audio = AudioSegment.from_file(io.BytesIO(audio_bytes))
-        wav_buffer = io.BytesIO()
-        audio.export(wav_buffer, format="wav")
-        wav_buffer.seek(0)
-
-        # Use speech recognition
-        recognizer = sr.Recognizer()
-        with sr.AudioFile(wav_buffer) as source:
-            audio_data = recognizer.record(source)
-            text = recognizer.recognize_google(audio_data)
-            return text
-    except sr.UnknownValueError:
-        return None
-    except sr.RequestError as e:
-        st.error(f"Speech recognition service error: {e}")
-        return None
-    except Exception as e:
-        st.error(f"Audio processing error: {e}")
-        return None
-
 # --- UI ---
 
 # Initialize session state
 if "messages" not in st.session_state:
     st.session_state.messages = []
     st.session_state.chat = model.start_chat(history=[]) if model else None
-if "voice_input" not in st.session_state:
-    st.session_state.voice_input = ""
-if "last_audio_len" not in st.session_state:
-    st.session_state.last_audio_len = 0
 if "show_welcome" not in st.session_state:
     st.session_state.show_welcome = True
+if "user_input" not in st.session_state:
+    st.session_state.user_input = ""
 
 # Add top padding for fixed header
 st.markdown('<div style="padding-top: 60px;"></div>', unsafe_allow_html=True)
 
+# Function to process and send message
+def send_message(message):
+    if message and message.strip():
+        st.session_state.messages.append({"role": "user", "content": message})
+        st.session_state.show_welcome = False
+        
+        if st.session_state.chat:
+            try:
+                response = st.session_state.chat.send_message(message)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
+            except Exception as e:
+                st.session_state.messages.append({"role": "assistant", "content": f"Error: {e}"})
+
 # Function to handle suggestion click
 def handle_suggestion(suggestion):
-    st.session_state.pending_prompt = suggestion
-    st.session_state.show_welcome = False
+    send_message(suggestion)
 
 # Welcome screen (only show when no conversation)
 if st.session_state.show_welcome and len(st.session_state.messages) == 0:
@@ -493,8 +406,7 @@ if st.session_state.show_welcome and len(st.session_state.messages) == 0:
     # Mic hint
     st.markdown('''
     <p class="mic-hint">
-        <span class="mic-icon-hint">🎤</span>
-        Tap mic to speak or type below
+        🎤 Tap mic to speak or type below
     </p>
     ''', unsafe_allow_html=True)
 
@@ -504,80 +416,59 @@ else:
         with st.chat_message(msg["role"]):
             st.write(msg["content"])
 
-# Process pending prompt from suggestion buttons
-if "pending_prompt" in st.session_state and st.session_state.pending_prompt:
-    prompt = st.session_state.pending_prompt
-    st.session_state.pending_prompt = None
+# Custom input bar at the bottom using HTML/CSS
+st.markdown('''
+<div class="custom-input-bar">
+    <div class="input-wrapper" id="custom-input-wrapper">
+        <!-- Input will be placed here by Streamlit -->
+    </div>
+</div>
+''', unsafe_allow_html=True)
+
+# Create the actual input using a form
+with st.form(key="chat_form", clear_on_submit=True):
+    col_input, col_mic, col_send = st.columns([8, 1, 1])
     
-    with st.chat_message("user"):
-        st.write(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    with col_input:
+        user_input = st.text_input(
+            label="Message",
+            placeholder="Type your message...",
+            key="text_input",
+            label_visibility="collapsed"
+        )
     
-    if st.session_state.chat:
-        with st.chat_message("assistant"):
-            with st.spinner(""):
-                try:
-                    response = st.session_state.chat.send_message(prompt)
-                    st.write(response.text)
-                    st.session_state.messages.append({"role": "assistant", "content": response.text})
-                except Exception as e:
-                    st.error(f"Error: {e}")
+    with col_mic:
+        # Audio file uploader as mic alternative
+        audio_file = st.file_uploader(
+            "🎤",
+            type=["wav", "mp3", "m4a", "ogg"],
+            key="audio_upload",
+            label_visibility="collapsed"
+        )
+    
+    with col_send:
+        submitted = st.form_submit_button("➤")
+
+# Process text input
+if submitted and user_input:
+    send_message(user_input)
     st.rerun()
 
-# Voice input section - mic button positioned via CSS
-# Audio recorder (will be positioned by CSS to appear in input bar)
-audio = audiorecorder("🎤", "🔴", key="audio_recorder")
-
-if len(audio) > 0:
-    audio_bytes = audio.export().read()
-    current_len = len(audio_bytes)
-    
-    # Auto-transcribe when new audio is detected
-    if current_len != st.session_state.last_audio_len:
-        st.session_state.last_audio_len = current_len
+# Process audio input
+if audio_file is not None:
+    try:
+        audio_bytes = audio_file.read()
+        audio = AudioSegment.from_file(io.BytesIO(audio_bytes))
+        wav_buffer = io.BytesIO()
+        audio.export(wav_buffer, format="wav")
+        wav_buffer.seek(0)
         
-        with st.spinner("🎤 Transcribing..."):
-            transcribed_text = transcribe_audio(audio_bytes)
-            if transcribed_text:
-                st.session_state.voice_input = transcribed_text
-                st.session_state.show_welcome = False
+        recognizer = sr.Recognizer()
+        with sr.AudioFile(wav_buffer) as source:
+            audio_data = recognizer.record(source)
+            text = recognizer.recognize_google(audio_data)
+            if text:
+                send_message(f"🎤 {text}")
                 st.rerun()
-            else:
-                st.toast("Could not understand audio. Please try again.", icon="⚠️")
-
-# Process voice input if available
-if st.session_state.voice_input:
-    prompt = st.session_state.voice_input
-    st.session_state.voice_input = ""
-
-    with st.chat_message("user"):
-        st.write(f"🎤 {prompt}")
-    st.session_state.messages.append({"role": "user", "content": f"🎤 {prompt}"})
-
-    if st.session_state.chat:
-        with st.chat_message("assistant"):
-            with st.spinner(""):
-                try:
-                    response = st.session_state.chat.send_message(prompt)
-                    st.write(response.text)
-                    st.session_state.messages.append({"role": "assistant", "content": response.text})
-                except Exception as e:
-                    st.error(f"Error: {e}")
-
-# Chat input (text) - main input at bottom
-if prompt := st.chat_input("Type your message..."):
-    st.session_state.show_welcome = False
-    
-    with st.chat_message("user"):
-        st.write(prompt)
-    st.session_state.messages.append({"role": "user", "content": prompt})
-
-    if st.session_state.chat:
-        with st.chat_message("assistant"):
-            with st.spinner(""):
-                try:
-                    response = st.session_state.chat.send_message(prompt)
-                    st.write(response.text)
-                    st.session_state.messages.append({"role": "assistant", "content": response.text})
-                except Exception as e:
-                    st.error(f"Error: {e}")
+    except Exception as e:
+        st.toast(f"Could not process audio: {e}", icon="⚠️")
