@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { MODES, type ModeKey } from "../lib/modes";
+import MessageContent from "../components/MessageContent";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -104,7 +105,9 @@ export default function HomePage() {
         {messages.map((msg, idx) => (
           <div key={idx} className={`message ${msg.role}`}>
             <h4>{msg.role === "user" ? "You" : "Darshini"}</h4>
-            <p>{msg.content}</p>
+            <div className="message-content">
+              <MessageContent content={msg.content} />
+            </div>
           </div>
         ))}
       </section>
@@ -112,7 +115,10 @@ export default function HomePage() {
       <div className="input-shell">
         <label className="mode-select">
           <span>Mode</span>
-          <select value={mode} onChange={(e) => setMode(e.target.value as ModeKey)}>
+          <select value={mode} onChange={(e) => {
+            const newMode = e.target.value as ModeKey;
+            if (newMode in MODES) setMode(newMode);
+          }}>
             {Object.entries(MODES).map(([key, value]) => (
               <option key={key} value={key}>
                 {value.label}

@@ -142,6 +142,47 @@ main {
   line-height: 1.6;
 }
 
+.message-content {
+  line-height: 1.6;
+}
+
+.message-content p {
+  margin: 0 0 10px;
+  white-space: pre-wrap;
+}
+
+.message-content p:last-child {
+  margin-bottom: 0;
+}
+
+.message-content strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.message-content em {
+  font-style: italic;
+  color: var(--ink);
+}
+
+.message-content code {
+  background: rgba(201, 154, 39, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.message-content ul,
+.message-content ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.message-content li {
+  margin: 4px 0;
+}
+
 .input-shell {
   position: fixed;
   bottom: 22px;
