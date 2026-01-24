@@ -16,7 +16,7 @@ let cachedContext: string | null = null;
 
 function loadContext(): string {
   if (cachedContext) return cachedContext;
-  const contextPath = path.join(process.cwd(), "..", "Dakshina_Murthi_Context.txt");
+  const contextPath = path.join(process.cwd(), "Dakshina_Murthi_Context.txt");
   if (!fs.existsSync(contextPath)) {
     throw new Error("Context file not found");
   }

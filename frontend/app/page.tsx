@@ -18,14 +18,8 @@ export default function HomePage() {
   const [status, setStatus] = useState("");
   const [micSupported, setMicSupported] = useState(false);
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
     const SpeechClass: SpeechConstructor | undefined =
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (!SpeechClass) return;
@@ -45,7 +39,7 @@ export default function HomePage() {
     rec.onend = () => setStatus("");
     rec.onerror = () => setStatus("Mic unavailable — please type instead");
     recognitionRef.current = rec;
-  }, [mounted]);
+  }, []);
 
   const handleSend = async (text?: string) => {
     const prompt = (text ?? input).trim();
@@ -96,7 +90,7 @@ export default function HomePage() {
   const showHero = messages.length === 0;
 
   return (
-    <main suppressHydrationWarning>
+    <main>
       <div className="header-bar" />
       {showHero && (
         <section className="hero">

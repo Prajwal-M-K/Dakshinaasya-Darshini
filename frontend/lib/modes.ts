@@ -2,7 +2,7 @@ export type ModeKey = "quickfire" | "lifehelp" | "sadhaka";
 
 export const MODES: Record<ModeKey, { label: string; maxTokens: number; instruction: string }> = {
   quickfire: {
-    label: "⚡ Quick help",
+    label: "Quick help",
     maxTokens: 1024,
     instruction: `RESPONSE MODE: QUICKFIRE
 - Maximum 2-3 sentences.
@@ -10,7 +10,7 @@ export const MODES: Record<ModeKey, { label: string; maxTokens: number; instruct
 - Keep it simple and actionable. No metaphors unless absolutely necessary.`,
   },
   lifehelp: {
-    label: "🌿 Balanced",
+    label: "Balanced",
     maxTokens: 2048,
     instruction: `RESPONSE MODE: LIFE HELP
 - 4-6 sentences.
@@ -19,7 +19,7 @@ export const MODES: Record<ModeKey, { label: string; maxTokens: number; instruct
 - Avoid being preachy or overly philosophical. Be a helpful friend first.`,
   },
   sadhaka: {
-    label: "📿 Deep study",
+    label: "Deep study",
     maxTokens: 4096,
     instruction: `RESPONSE MODE: SADHAKA (Deep Spiritual Study)
 - For users who explicitly want philosophical/spiritual depth.

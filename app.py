@@ -5,7 +5,7 @@ import google.generativeai as genai
 import streamlit as st
 
 # --- Configuration ---
-st.set_page_config(page_title="Dakshinaasya Darshini", page_icon="🕉️", layout="centered")
+st.set_page_config(page_title="Dakshinaasya Darshini", page_icon="ॐ", layout="centered")
 
 # --- Load Context ---
 @st.cache_resource
@@ -30,7 +30,7 @@ def get_api_key():
 # --- Mode Configurations ---
 MODES = {
     "quickfire": {
-        "label": "⚡ Quick help",
+        "label": "Quick help",
         "instruction": """RESPONSE MODE: QUICKFIRE
 - Maximum 2-3 sentences.
 - Give DIRECT, PRACTICAL (completely grounded in the context) advice first. What should they actually DO?
@@ -38,7 +38,7 @@ MODES = {
         "max_tokens": 1024
     },
     "lifehelp": {
-        "label": "🌿 Balanced",
+        "label": "Balanced",
         "instruction": """RESPONSE MODE: LIFE HELP
 - 4-6 sentences.
 - Start with DIRECT, PRACTICAL (completely grounded in the context) advice — what should they actually do?
@@ -47,7 +47,7 @@ MODES = {
         "max_tokens": 2048
     },
     "sadhaka": {
-        "label": "📿 Deep study",
+        "label": "Deep study",
         "instruction": """RESPONSE MODE: SADHAKA (Deep Spiritual Study)
 - For users who explicitly want philosophical/spiritual depth.
 - Cite specific slokas with meanings. Reference teachings directly.
@@ -133,7 +133,7 @@ st.markdown(
 )
 
 # --- Mode selection ---
-st.markdown('<div class="header"><h2>🕉️ Dakshinaasya Darshini</h2></div>', unsafe_allow_html=True)
+st.markdown('<div class="header"><h2>ॐ Dakshinaasya Darshini</h2></div>', unsafe_allow_html=True)
 col1, col2 = st.columns([1, 4])
 with col1:
     st.write("Mode")

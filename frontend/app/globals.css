@@ -190,6 +190,16 @@ main {
   width: 100%;
   cursor: pointer;
   font-size: 14px;
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  appearance: none;
+  padding-right: 4px;
+}
+
+.mode-select select option {
+  background: white;
+  color: var(--ink);
+  font-family: var(--font-body), "Segoe UI", sans-serif;
+  padding: 8px;
 }
 
 .text-entry {
