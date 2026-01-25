@@ -88,6 +88,39 @@ export default function HomePage() {
     }
   };
 
+  const handleDownload = () => {
+    if (messages.length === 0) {
+      setStatus("No conversation to download yet.");
+      setTimeout(() => setStatus(""), 2000);
+      return;
+    }
+
+    // Format the conversation
+    let content = "# Conversation with Dakshinaasya Darshini\n\n";
+    content += `Date: ${new Date().toLocaleDateString()}\n`;
+    content += `Mode: ${MODES[mode].label}\n\n`;
+    content += "---\n\n";
+
+    messages.forEach((msg) => {
+      const speaker = msg.role === "user" ? "**You**" : "**Darshini**";
+      content += `${speaker}:\n${msg.content}\n\n`;
+    });
+
+    // Create blob and download
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `darshini-chat-${Date.now()}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    setStatus("Chat downloaded!");
+    setTimeout(() => setStatus(""), 2000);
+  };
+
   const showHero = messages.length === 0;
 
   return (
@@ -98,6 +131,17 @@ export default function HomePage() {
           <div className="om">ॐ</div>
           <h1>Namaste</h1>
           <p>I am Dakshinaasya Darshini, your spiritual guide. Ask me anything.</p>
+          <div className="suggestion-row">
+            <div className="suggestion" onClick={() => handleSend("I'm feeling very sad, can you cheer me up?")}>
+              I'm feeling very sad, can you cheer me up?
+            </div>
+            <div className="suggestion" onClick={() => handleSend("I'm not able to control my senses - what can I do?")}>
+              I'm not able to control my senses - what can I do?
+            </div>
+            <div className="suggestion" onClick={() => handleSend("I have an exam tomorrow & I'm really anxious - help me please")}>
+              I have an exam tomorrow & I'm really anxious - help me please
+            </div>
+          </div>
         </section>
       )}
 
@@ -106,7 +150,7 @@ export default function HomePage() {
           <div key={idx} className={`message ${msg.role}`}>
             <h4>{msg.role === "user" ? "You" : "Darshini"}</h4>
             <div className="message-content">
-              <MessageContent content={msg.content} />
+              <MessageContent content={msg.content} isAssistant={msg.role === "assistant"} />
             </div>
           </div>
         ))}
@@ -126,6 +170,16 @@ export default function HomePage() {
             ))}
           </select>
         </label>
+
+        {messages.length > 0 && (
+          <button 
+            className="download-btn" 
+            onClick={handleDownload}
+            title="Download conversation"
+          >
+            💾
+          </button>
+        )}
 
         <input
           className="text-entry"
@@ -154,7 +208,9 @@ export default function HomePage() {
           </button>
         </div>
       </div>
-      <div className="status-chip">{status || (loading ? "Generating..." : "")}</div>
+      {(status || loading) && (
+        <div className="status-chip">{status || "Generating..."}</div>
+      )}
     </main>
   );
 }
