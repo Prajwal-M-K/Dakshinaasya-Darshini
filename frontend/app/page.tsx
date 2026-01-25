@@ -133,13 +133,13 @@ export default function HomePage() {
           <p>I am Dakshinaasya Darshini, your spiritual guide. Ask me anything.</p>
           <div className="suggestion-row">
             <div className="suggestion" onClick={() => handleSend("I'm feeling very sad, can you cheer me up?")}>
-              I'm feeling very sad, can you cheer me up?
+              I&apos;m feeling very sad, can you cheer me up?
             </div>
             <div className="suggestion" onClick={() => handleSend("I'm not able to control my senses - what can I do?")}>
-              I'm not able to control my senses - what can I do?
+              I&apos;m not able to control my senses - what can I do?
             </div>
             <div className="suggestion" onClick={() => handleSend("I have an exam tomorrow & I'm really anxious - help me please")}>
-              I have an exam tomorrow & I'm really anxious - help me please
+              I have an exam tomorrow &amp; I&apos;m really anxious - help me please
             </div>
           </div>
         </section>
