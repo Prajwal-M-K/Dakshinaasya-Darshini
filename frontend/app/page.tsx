@@ -168,12 +168,10 @@ export default function HomePage() {
             <p>Choose your preferred language to begin</p>
             <div className="language-options">
               <div className="language-option" onClick={() => handleLanguageSelect("en")}>
-                <div className="lang-emoji">🇬🇧</div>
                 <div className="lang-name">English</div>
                 <div className="lang-native">English</div>
               </div>
               <div className="language-option" onClick={() => handleLanguageSelect("kn")}>
-                <div className="lang-emoji">🇮🇳</div>
                 <div className="lang-name">Kannada</div>
                 <div className="lang-native">ಕನ್ನಡ</div>
               </div>
