@@ -2,56 +2,93 @@
 
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
+import type { Language } from "../lib/modes";
 
 export default function MessageContent({ 
   content, 
-  isAssistant = false 
+  isAssistant = false,
+  language = "en"
 }: { 
   content: string;
   isAssistant?: boolean;
+  language?: Language;
 }) {
   const [speaking, setSpeaking] = useState(false);
-  const [speechSupported, setSpeechSupported] = useState(false);
+  const [kannadaVoiceAvailable, setKannadaVoiceAvailable] = useState(false);
 
   useEffect(() => {
-    // Check if speech synthesis is supported
-    setSpeechSupported('speechSynthesis' in window);
+    // Check if Kannada voice is available in speech synthesis
+    if ('speechSynthesis' in window) {
+      const checkVoices = () => {
+        const voices = window.speechSynthesis.getVoices();
+        const hasKannada = voices.some(v => 
+          v.lang.startsWith('kn') || v.lang.includes('kn-IN')
+        );
+        setKannadaVoiceAvailable(hasKannada);
+      };
+      
+      // Check immediately and on voice change
+      checkVoices();
+      window.speechSynthesis.onvoiceschanged = checkVoices;
+    }
   }, []);
 
   const handleSpeak = () => {
-    if (!speechSupported || !window.speechSynthesis) return;
-
     // Stop any ongoing speech
     if (speaking) {
-      window.speechSynthesis.cancel();
+      window.speechSynthesis?.cancel();
       setSpeaking(false);
       return;
     }
 
-    // Create utterance from content (strip markdown formatting)
-    const textToSpeak = content.replace(/[#*_`[\]()]/g, '');
-    const utterance = new SpeechSynthesisUtterance(textToSpeak);
-    utterance.rate = 0.9; // Slightly slower for clarity
-
-    utterance.onstart = () => setSpeaking(true);
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-
-    window.speechSynthesis.speak(utterance);
+    // Create text to speak (strip markdown formatting)
+    const textToSpeak = content
+      .replace(/!\[[^\]]*\]\([^)]*\)/g, '')   // Remove images
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Keep link text, remove url
+      .replace(/[#*_`]/g, '')                  // Remove decoration chars
+      .trim();
+    
+    // Only proceed if native voice is available
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      
+      if (language === "kn") {
+        utterance.lang = "kn-IN";
+        utterance.rate = 0.8;
+      } else {
+        utterance.lang = "en-US";
+        utterance.rate = 0.9;
+      }
+      
+      utterance.onstart = () => setSpeaking(true);
+      utterance.onend = () => setSpeaking(false);
+      utterance.onerror = () => setSpeaking(false);
+      
+      window.speechSynthesis.speak(utterance);
+    }
   };
+
+  const speakButtonIcon = speaking ? '⏸️' : '🔊';
+
+  const speakButtonTitle = language === "kn"
+    ? (speaking ? "ನಿಲ್ಲಿಸಿ" : "ಕೇಳಿ")
+    : (speaking ? "Stop" : "Listen");
+
+  // Only show button if English or if Kannada voice is explicitly available
+  const showButton = isAssistant && (language === "en" || (language === "kn" && kannadaVoiceAvailable));
 
   return (
     <div className="message-content-wrapper">
-      <ReactMarkdown>{content}</ReactMarkdown>
-      {isAssistant && speechSupported && (
+      {showButton && (
         <button
-          className="speak-btn"
+          className="speak-btn-small"
           onClick={handleSpeak}
-          title={speaking ? "Stop speaking" : "Read aloud"}
+          title={speakButtonTitle}
         >
-          {speaking ? '⏸️ Stop' : '🔊 Listen'}
+          {speakButtonIcon} {language === "kn" ? (speaking ? "ನಿಲ್ಲಿಸಿ" : "ಕೇಳಿ") : (speaking ? "Stop" : "Listen")}
         </button>
       )}
+      <ReactMarkdown>{content}</ReactMarkdown>
     </div>
   );
 }

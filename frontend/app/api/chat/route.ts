@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import fs from "fs";
 import path from "path";
-import { MODES, buildSystemPrompt, ModeKey } from "../../../lib/modes";
+import { MODES, buildSystemPrompt, ModeKey, Language } from "../../../lib/modes";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
 type Payload = {
   message: string;
   mode?: ModeKey;
+  language?: Language;
   history?: ChatMessage[];
 };
 
@@ -29,6 +30,7 @@ export async function POST(req: Request) {
     const body = (await req.json()) as Payload;
     const message = body.message?.trim();
     const mode: ModeKey = body.mode ?? "lifehelp";
+    const language: Language = body.language ?? "en";
     const history = body.history ?? [];
 
     if (!message) {
@@ -47,7 +49,7 @@ export async function POST(req: Request) {
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
-      systemInstruction: buildSystemPrompt(mode, context),
+      systemInstruction: buildSystemPrompt(mode, context, language),
       generationConfig: {
         temperature: 0.7,
         maxOutputTokens: MODES[mode].maxTokens,

@@ -1,6 +1,20 @@
-# Dakshinaasya Darshini (Next.js)
+# Dakshinaasya Darshini
 
-A sleek Next.js front-end for the Dakshinaasya Darshini demo with inline mode selector and voice-to-text input.
+## About
+
+Dakshinaasya Darshini is an AI-powered spiritual guide grounded in the teachings of the Dakshinamurthy Ashtakam, as conveyed through the upanyasas (discourses) of His Holiness Sri Shankara Bharati Mahaswaminaha. The application serves as a conversational companion that helps users navigate real-life challenges through the lens of Advaita Vedanta philosophy.
+
+The name "Dakshinaasya Darshini" translates to "one who reveals the south-facing one" — a reference to Lord Dakshinamurthy, the aspect of Shiva as the supreme teacher who imparts wisdom through silence. This application embodies that spirit by offering thoughtful, practical guidance rooted in ancient wisdom but delivered in accessible, modern language.
+
+Key capabilities include:
+
+- Three response modes: Quickfire (concise answers), Default (balanced guidance), and Deep Dive (comprehensive philosophical exploration)
+- Bilingual support for English and Kannada
+- Voice input via Web Speech API for hands-free interaction
+- Text-to-speech for listening to responses
+- Conversation export for personal reference
+
+The frontend is built with Next.js and communicates with the Gemini API to generate contextually aware responses based on the teachings provided in the knowledge base.
 
 ## Quick start
 
@@ -42,4 +56,4 @@ The API route works server-side only, so the API key is secure.
 ## Notes
 
 - Voice input uses the Web Speech API (Chrome recommended). If unavailable, use text input instead.
-- Modes: Quick help, Balanced, Deep study map to the same instructions as the Streamlit version.
+- Modes: Quickfire, Default, and Deep Dive provide progressively detailed responses based on user needs.
