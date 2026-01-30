@@ -85,7 +85,7 @@ export default function MessageContent({
           onClick={handleSpeak}
           title={speakButtonTitle}
         >
-          {speakButtonIcon} {language === "kn" ? (speaking ? "ನಿಲ್ಲಿಸಿ" : "ಕೇಳಿ") : (speaking ? "Stop" : "Listen")}
+          {speakButtonIcon} {speaking ? "Stop" : "Listen"}
         </button>
       )}
       <ReactMarkdown>{content}</ReactMarkdown>
