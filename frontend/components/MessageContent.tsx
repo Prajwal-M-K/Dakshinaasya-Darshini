@@ -74,8 +74,8 @@ export default function MessageContent({
     ? (speaking ? "ನಿಲ್ಲಿಸಿ" : "ಕೇಳಿ")
     : (speaking ? "Stop" : "Listen");
 
-  // Only show button if English or if Kannada voice is explicitly available
-  const showButton = isAssistant && (language === "en" || (language === "kn" && kannadaVoiceAvailable));
+  // Only show button for English (Kannada voice support not reliable)
+  const showButton = isAssistant && language === "en";
 
   return (
     <div className="message-content-wrapper">

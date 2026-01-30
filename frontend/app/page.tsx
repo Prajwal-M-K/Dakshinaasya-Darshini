@@ -216,7 +216,7 @@ export default function HomePage() {
           <select value={mode} onChange={(e) => {
             const newMode = e.target.value as ModeKey;
             if (newMode in MODES) setMode(newMode);
-          }}>
+          }} suppressHydrationWarning>
             {Object.entries(MODES).map(([key, value]) => (
               <option key={key} value={key}>
                 {language === "kn" ? value.labelKn : value.label}
